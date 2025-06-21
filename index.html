@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>JR 発車メロディ</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+ body{font-family:sans-serif;text-align:center;margin:0;background:#f4f7fa}
+ header{background:#0f4c81;color:#fff;padding:12px 0;font-size:1.4rem}
+ main{padding:20px}
+ select,button{font-size:1rem;padding:6px 12px;margin:6px;border-radius:6px;border:1px solid #bbb}
+ button{background:#0f4c81;color:#fff}
+ iframe{width:90%;height:200px;border:none;margin-top:14px}
+ @media(min-width:600px){iframe{height:260px}}
+</style>
+</head>
+<body>
+<header>🚆 JR 発車メロディ</header>
+<main>
+  <img src="img/train.png" alt="train" width="260"><br>
+  <select id="lineSel"><option value="">路線を選択</option></select><br>
+  <select id="stationSel"><option>駅を選択</option></select><br>
+  <button onclick="play()">▶ 再生</button>
+  <button onclick="stop()">⏹ 停止</button>
+  <iframe id="player" title="melody player"></iframe>
+</main>
+<script>
+const lineSel = document.getElementById('lineSel');
+const stationSel = document.getElementById('stationSel');
+const player = document.getElementById('player');
+
+// 路線一覧ロード
+fetch('lines_manifest.json')
+  .then(r=>r.json())
+  .then(lines=>{
+    lines.forEach(l=>{
+      const op=document.createElement('option');
+      op.value=l.id; op.textContent=l.name;
+      lineSel.appendChild(op);
+    });
+  });
+
+// 路線選択で駅一覧ロード
+lineSel.addEventListener('change', ()=>{
+  stationSel.innerHTML='<option>読み込み中…</option>';
+  if(!lineSel.value){player.src='about:blank';return;}
+  fetch(`lines/${lineSel.value}.json`)
+    .then(r=>r.json())
+    .then(sts=>{
+      stationSel.innerHTML='';
+      sts.forEach(s=>{
+        const op=document.createElement('option');
+        op.value = s.url || '';
+        op.textContent = s.station + (s.url ? '' : '（音源なし）');
+        stationSel.appendChild(op);
+      });
+    });
+});
+
+// 再生停止
+function play(){
+  if(stationSel.value){
+    player.src = stationSel.value + '?autoplay=1';
+  }else{
+    alert('この駅は音源未登録です');
+  }
+}
+function stop(){player.src='about:blank';}
+</script>
+</body>
+</html>
