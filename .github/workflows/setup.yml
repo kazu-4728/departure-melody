@@ -1,0 +1,23 @@
+name: Setup Repository
+on:
+  workflow_dispatch:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Git configuration
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://${{ secrets.PAT_TOKEN }}@github.com/kazu-4728/departure-melody.git
+          git remote -v
+      - name: Test Push
+        run: |
+          echo "# Test commit" >> test.md
+          git add test.md
+          git commit -m "test: Add test file"
+          git push origin main
