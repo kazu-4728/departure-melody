@@ -11,3 +11,4 @@ GitHub Pages で公開するシンプルな Web アプリです。
 * `lines_manifest.json` に路線を追加  
 * `lines/<id>.json` を同形式で作成して駅を追加  
 Push するだけで UI に即反映されます。
+<!-- Auto push test -->
