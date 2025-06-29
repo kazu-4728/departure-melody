@@ -20,14 +20,27 @@
   <img src="img/train.png" alt="train" width="260"><br>
   <select id="lineSel"><option value="">路線を選択</option></select><br>
   <select id="stationSel"><option>駅を選択</option></select><br>
+  <input id="searchBox" list="stationsList" placeholder="駅名検索"><datalist id="stationsList"></datalist><br>
   <button onclick="play()">▶ 再生</button>
   <button onclick="stop()">⏹ 停止</button>
   <iframe id="player" title="melody player"></iframe>
 </main>
+<script src="station_index.js"></script>
 <script>
 const lineSel = document.getElementById('lineSel');
 const stationSel = document.getElementById('stationSel');
 const player = document.getElementById('player');
+const searchBox = document.getElementById('searchBox');
+const stationsList = document.getElementById('stationsList');
+
+// 検索候補をセット
+if (typeof stationIndex !== 'undefined') {
+  stationIndex.forEach(s => {
+    const op = document.createElement('option');
+    op.value = s.station;
+    stationsList.appendChild(op);
+  });
+}
 
 // 路線一覧ロード
 fetch('lines_manifest.json')
@@ -54,6 +67,26 @@ lineSel.addEventListener('change', ()=>{
         op.textContent = s.station + (s.url ? '' : '（音源なし）');
         stationSel.appendChild(op);
       });
+    });
+});
+
+// 駅名検索
+searchBox.addEventListener('change', ()=>{
+  const name = searchBox.value.trim();
+  const info = stationIndex.find(s => s.station === name);
+  if(!info) return;
+  lineSel.value = info.line;
+  fetch(`lines/${info.line}.json`)
+    .then(r=>r.json())
+    .then(sts=>{
+      stationSel.innerHTML='';
+      sts.forEach(s=>{
+        const op=document.createElement('option');
+        op.value = s.url || '';
+        op.textContent = s.station + (s.url ? '' : '（音源なし）');
+        stationSel.appendChild(op);
+      });
+      stationSel.value = info.url || '';
     });
 });
 

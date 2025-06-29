@@ -2,5 +2,13 @@
   {
     "id": "yamanote",
     "name": "山手線"
+  },
+  {
+    "id": "chuo",
+    "name": "中央線"
+  },
+  {
+    "id": "keihintohoku",
+    "name": "京浜東北線"
   }
 ]
